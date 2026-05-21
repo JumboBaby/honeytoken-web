@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRANSACTION ERROR 410 · SEVERE DISRUPTION</title>
+  <!-- Optional file:// overrides: set content or omit and use globals / query params -->
+  <meta name="supabase-url" content="">
+  <meta name="supabase-anon-key" content="">
+  <style>
+    :root {
+      --bg-deep: #0a0c0f;
+      --panel: rgba(18, 20, 26, 0.92);
+      --border-dim: rgba(207, 102, 121, 0.35);
+      --text-muted: #7a8494;
+      --text-alert: #e57373;
+      --accent-amber: #ffb74d;
+      --accent-cyan: #4fc3f7;
+      --grid: rgba(79, 195, 247, 0.04);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background-color: var(--bg-deep);
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--text-muted);
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+    .tactical-shell {
+      max-width: 520px;
+      width: 100%;
+      padding: 28px 26px;
+      border: 1px solid var(--border-dim);
+      border-radius: 4px;
+      background: var(--panel);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 12px 40px rgba(0, 0, 0, 0.55);
+    }
+    .strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(207, 102, 121, 0.2);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      font-weight: 800;
+      color: var(--accent-amber);
+    }
+    .strip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-alert);
+      box-shadow: 0 0 10px rgba(229, 115, 115, 0.7);
+      animation: pulse 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes pulse {
+      from { opacity: 0.45; }
+      to { opacity: 1; }
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: #f2f5fa;
+      line-height: 1.35;
+    }
+    .code-410 {
+      color: var(--text-alert);
+    }
+    .sub {
+      font-size: 11px;
+      line-height: 1.55;
+      color: var(--text-muted);
+      margin: 0 0 14px;
+    }
+    .sub strong { color: #b0bcc8; font-weight: 700; }
+    .footer-note {
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(122, 132, 148, 0.25);
+      font-size: 9px;
+      line-height: 1.45;
+      color: rgba(122, 132, 148, 0.75);
+    }
+    code {
+      font-size: 9px;
+      word-break: break-all;
+      color: var(--accent-cyan);
+    }
+    #ingest-status {
+      margin-top: 12px;
+      font-size: 9px;
+      color: rgba(122, 132, 148, 0.55);
+      min-height: 1.2em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="tactical-shell" role="status" aria-live="polite">
+  <div class="strip">
+    <span class="strip-dot" aria-hidden="true"></span>
+    <span>SECURE CLEARING NODE · RESPONSE CORRELATION</span>
+  </div>
+  <h1><span class="code-410">⚠️ TRANSACTION ERROR 410</span> / SEVERE DISRUPTION DETECTED</h1>
+  <p class="sub">
+    The authenticated settlement rail or escrow session terminated abnormally.
+    <strong>Ingress validation failed</strong> — no further settlement primitives will be dispatched on this conduit.
+    If you originated this trace, discontinue execution and escalate through your incident channel.
+  </p>
+  <p class="sub" style="margin-bottom: 0;">
+    Reference: forensic intake channel <code>L3-PROBE</code> · Node health: <strong>NON-OPERATIONAL</strong>
+  </p>
+  <div id="ingest-status" aria-live="polite"></div>
+  <div class="footer-note">
+    Session artefacts are audited. Repeated access attempts may be classified as anomaly traffic.
+    <br><br>
+    Telemetry correlation ID (if routed): see URL query <code>?id=&lt;honeytoken&gt;</code>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /**
+   * Local file:// harness: replace sentinel with your honeytoken row id when ?id= is absent.
+   */
+  const testBaitId = 'PASTE_YOUR_ID_HERE';
+
+  /**
+   * Mirror Flutter `main.dart` / `--dart-define=SUPABASE_*` defaults for convenience.
+   * Override via: globals, meta tags, or query ?sb_url= & ?sb_key=
+   */
+  const DEFAULT_SUPABASE_URL = 'https://jdixbcpbpxxnyiqsfjoc.supabase.co';
+  /** Same default anon as main.dart — replace locally if yours differs */
+  const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_uYd_2UJJZ6FrbFaeMtRdIg_HwKDTU6U';
+
+  const statusEl = document.getElementById('ingest-status');
+
+  function setStatus(text) {
+    if (statusEl) statusEl.textContent = text;
+  }
+
+  function metaContent(name) {
+    const n = document.querySelector('meta[name="' + name + '"]');
+    return (n && n.getAttribute('content')) ? String(n.getAttribute('content')).trim() : '';
+  }
+
+  function resolveCredentials() {
+    const params = new URLSearchParams(window.location.search || '');
+    const urlCandidate =
+      (typeof window.__SUPABASE_URL__ === 'string' && window.__SUPABASE_URL__.trim()) ||
+      params.get('sb_url')?.trim() ||
+      metaContent('supabase-url') ||
+      '';
+    const url = (urlCandidate || DEFAULT_SUPABASE_URL).trim().replace(/\/+$/, '');
+    const key =
+      (typeof window.__SUPABASE_ANON_KEY__ === 'string' && window.__SUPABASE_ANON_KEY__.trim()) ||
+      params.get('sb_key')?.trim() ||
+      metaContent('supabase-anon-key') ||
+      DEFAULT_SUPABASE_ANON_KEY.trim();
+    return {
+      url: url,
+      key: key || ''
+    };
+  }
+
+  /**
+   * ?id=honeytoken wins; else literal test bait if developer replaced sentinel.
+   */
+  function resolveBaitId() {
+    const params = new URLSearchParams(window.location.search || '');
+    const fromQuery = (params.get('id') || '').trim();
+    const tokenOk = /^[a-zA-Z0-9]{4,96}$/;
+    if (tokenOk.test(fromQuery)) return fromQuery;
+    const t = typeof testBaitId === 'string' ? testBaitId.trim() : '';
+    if (t && t !== 'PASTE_YOUR_ID_HERE' && tokenOk.test(t)) return t;
+    return null;
+  }
+
+  /** e.g. GMT+8, GMT-5, GMT+5:30 */
+  function formatGmtOffsetLabel() {
+    const offsetMinutes = -new Date().getTimezoneOffset();
+    const sign = offsetMinutes >= 0 ? '+' : '-';
+    const abs = Math.abs(offsetMinutes);
+    const h = Math.floor(abs / 60);
+    const m = abs % 60;
+    if (m === 0) return 'GMT' + sign + h;
+    return 'GMT' + sign + h + ':' + String(m).padStart(2, '0');
+  }
+
+  /**
+   * Coarse UA tags for OS string (Supabase merges with renderer downstream).
+   */
+  function uaOsTag(ua) {
+    if (!ua) return 'Unknown OS';
+    if (/Windows NT 10/i.test(ua)) return 'Windows 10 / 11';
+    if (/Windows/i.test(ua)) return 'Windows';
+    if (/iPhone|iPad|iPod/i.test(ua)) return /iPad/i.test(ua) ? 'iPadOS / iOS' : 'iOS';
+    if (/Mac OS X|Macintosh/i.test(ua)) return 'macOS';
+    if (/Android/i.test(ua)) {
+      const m = ua.match(/Android\s([\d._]+)/i);
+      return m ? 'Android ' + m[1].replace(/_/g, '.') : 'Android';
+    }
+    if (/CrOS/i.test(ua)) return 'Chrome OS';
+    if (/Linux/i.test(ua)) return 'Linux';
+    return 'Unknown OS';
+  }
+
+  /** Engine family label from User-Agent ordering (Chrome UA contains Safari) */
+  function uaRendererTag(ua) {
+    if (!ua) return 'Unknown engine';
+    if (/Edg\//i.test(ua)) return 'Blink (Edge)';
+    if (/OPR\/|Opera/i.test(ua)) return 'Blink (Opera)';
+    if (/Firefox\//i.test(ua)) return 'Gecko (Firefox)';
+    if (/SamsungBrowser/i.test(ua)) return 'Blink (Samsung)';
+    if (/Chrome\/|Chromium\/|CriOS/i.test(ua)) return 'Blink (Chrome)';
+    if (/Safari\//i.test(ua) && !/Chrome|Chromium|CriOS/i.test(ua)) return 'WebKit (Safari)';
+    return 'Unknown engine';
+  }
+
+  function buildLocaleTelemetry() {
+    const lang =
+      navigator.language ||
+      (navigator.languages && navigator.languages[0]) ||
+      (navigator.userLanguage) ||
+      'unknown';
+    return lang + ' / ' + formatGmtOffsetLabel();
+  }
+
+  function buildNetworkTelemetry() {
+    var n = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!n || !n.effectiveType) return 'Direct client egress · forensic probe · link class unknown';
+    var bits = [n.effectiveType];
+    if (typeof n.downlink === 'number' && !isNaN(n.downlink)) bits.push('~' + n.downlink + ' Mbps nominal');
+    if (n.saveData) bits.push('save-data:on');
+    if (typeof n.rtt === 'number') bits.push('RTT ~' + n.rtt + 'ms');
+    return 'Client egress · Network Information API · ' + bits.join(' · ');
+  }
+
+  function patchHoneytoken(baitId, creds, payload, onOutcome) {
+    if (!creds.url || !creds.key) {
+      setStatus('[CONFIG] Supabase URL/key missing — set meta / globals / ?sb_url & ?sb_key');
+      onOutcome(false);
+      return;
+    }
+    var endpoint = creds.url + '/rest/v1/honeytokens?id=eq.' + encodeURIComponent(baitId);
+
+    fetch(endpoint, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': creds.key,
+        'Authorization': 'Bearer ' + creds.key,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          console.warn('[Honeytoken] PATCH HTTP', response.status, response.statusText);
+          setStatus('[INGEST] Upstream declined (' + response.status + ') · check RLS/policy & row id.');
+          onOutcome(false);
+          return null;
+        }
+        setStatus('[INGEST] Forensic beacon accepted · telemetry latched.');
+        console.log('[Honeytoken] PATCH ok for baitId', baitId);
+        onOutcome(true);
+      })
+      .catch(function (err) {
+        console.error('[Honeytoken] PATCH failed', err);
+        setStatus('[INGEST] Transport fault — inspect CORS / connectivity.');
+        onOutcome(false);
+      });
+  }
+
+  function runIngest() {
+    var baitId = resolveBaitId();
+    if (!baitId) {
+      setStatus('[PROBE] Missing ?id · set URL param or replace testBaitId for local harness.');
+      return;
+    }
+
+    var ua = navigator.userAgent || '';
+    var payload = {
+      is_caught: true,
+      os: uaOsTag(ua),
+      renderer: uaRendererTag(ua),
+      locale: buildLocaleTelemetry(),
+      network: buildNetworkTelemetry()
+    };
+
+    patchHoneytoken(baitId, resolveCredentials(), payload, function () { /* noop */ });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runIngest);
+  } else {
+    runIngest();
+  }
+})();
+</script>
+
+</body>
+</html>
