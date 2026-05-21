@@ -204,14 +204,9 @@
    *   −480 → +480 → "GMT+8"; +240 → −240 → "GMT-4"
    */
   function formatGmtOffsetLabel() {
-    var utcMinusLocalMinutes = new Date().getTimezoneOffset();
-    var localMinusUtcMinutes = -utcMinusLocalMinutes;
-    var signChar = localMinusUtcMinutes >= 0 ? '+' : '-';
-    var absMinutes = Math.abs(localMinusUtcMinutes);
-    var h = Math.floor(absMinutes / 60);
-    var m = absMinutes % 60;
-    if (m === 0) return 'GMT' + signChar + h;
-    return 'GMT' + signChar + h + ':' + String(m).padStart(2, '0');
+    const offset = -new Date().getTimezoneOffset() / 60;
+    const sign = offset >= 0 ? '+' : '-';
+    return 'GMT' + sign + Math.abs(offset);
   }
 
   /**
