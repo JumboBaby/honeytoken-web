@@ -196,19 +196,21 @@
   }
 
   /**
-   * Local timezone offset label (e.g. GMT+8, GMT-4 via `shortOffset`).
-   * Primary: Intl.DateTimeFormat — avoids hand-rolled minute math.
-   * Fallback: negate getTimezoneOffset() as hours when Intl fails.
+   * Local timezone offset label (GMT±H). Parses ECMA-style `Date#toString()`
+   * `GMT±HHMM` token — no inversion vs `getTimezoneOffset()`.
    */
   function formatGmtOffsetLabel() {
     try {
-      const parts = new Intl.DateTimeFormat('en-US', { timeZoneName: 'shortOffset' }).formatToParts(new Date());
-      const tzPart = parts.find(part => part.type === 'timeZoneName');
-      return tzPart ? tzPart.value : 'GMT+8';
+      const str = new Date().toString();
+      // The date string typically ends with something like "GMT+0800 (Taipei Standard Time)"
+      const match = str.match(/GMT([+-]\d{2})(\d{2})?/);
+      if (match) {
+        const hours = parseInt(match[1], 10);
+        return 'GMT' + (hours >= 0 ? '+' : '') + hours;
+      }
+      return 'GMT+8';
     } catch (e) {
-      // Fallback if Intl API behaves unexpectedly
-      const offset = -new Date().getTimezoneOffset() / 60;
-      return 'GMT' + (offset >= 0 ? '+' : '-') + Math.abs(offset);
+      return 'GMT+8';
     }
   }
 
