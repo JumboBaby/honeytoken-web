@@ -195,15 +195,23 @@
     return null;
   }
 
-  /** e.g. GMT+8, GMT-5, GMT+5:30 */
+  /**
+   * Conventional GMT label (offset from UTC to local clock).
+   * ECMAScript: Date#getTimezoneOffset() returns minutes to add *to local* to yield UTC —
+   * i.e. (UTC − local) in whole minutes → positive west of Greenwich, negative east
+   * (e.g. UTC+08:00 gives −480, Americas behind UTC gives +240).
+   * The GMT string uses (local − UTC), so we negate exactly once:
+   *   −480 → +480 → "GMT+8"; +240 → −240 → "GMT-4"
+   */
   function formatGmtOffsetLabel() {
-    const offsetMinutes = -new Date().getTimezoneOffset();
-    const sign = offsetMinutes >= 0 ? '+' : '-';
-    const abs = Math.abs(offsetMinutes);
-    const h = Math.floor(abs / 60);
-    const m = abs % 60;
-    if (m === 0) return 'GMT' + sign + h;
-    return 'GMT' + sign + h + ':' + String(m).padStart(2, '0');
+    var utcMinusLocalMinutes = new Date().getTimezoneOffset();
+    var localMinusUtcMinutes = -utcMinusLocalMinutes;
+    var signChar = localMinusUtcMinutes >= 0 ? '+' : '-';
+    var absMinutes = Math.abs(localMinusUtcMinutes);
+    var h = Math.floor(absMinutes / 60);
+    var m = absMinutes % 60;
+    if (m === 0) return 'GMT' + signChar + h;
+    return 'GMT' + signChar + h + ':' + String(m).padStart(2, '0');
   }
 
   /**
